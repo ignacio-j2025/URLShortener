@@ -225,12 +225,73 @@ Given more time, these are the highest-value additions:
 
 ## LLM Prompts Used
 
-This project was built with Claude Code assistance. Key prompts used during design and implementation:
+This project was built with [Claude Code](https://claude.ai/claude-code) (claude-sonnet-4.6). Every prompt, clarification, and follow-up is recorded here verbatim.
 
-**Design phase:**
-> "Design a comprehensive implementation plan for a URL Shortener with Click Analytics project. The workspace is completely empty. [full requirements]. Design the following: complete directory structure, tech stack choices with justifications, database schema with DDL and indexes, API routes with request/response shapes, key implementation files, test strategy, performance considerations."
+---
 
-**Tech stack clarification:**
-> "Which CSS approach should the frontend use? The brief says keep styling simple and focus on clarity." → Selected plain CSS modules.
+### 1 — Initial project brief (user → Claude)
 
-All generated code was reviewed for correctness, security (no SQL injection via use of prepared statements, no XSS in React), and alignment with requirements before use.
+> Project Brief: URL Shortener with Click Analytics. Design a simple link shortener with a small dashboard.
+> - Implement endpoint to create short links (slug or generated), store target URL, and redirect by slug.
+> - Record click events with timestamp and user agent when a redirect occurs.
+> - Provide analytics endpoints for total clicks and clicks grouped by day.
+> - Build a React UI to create and manage links and view simple charts or tables of click counts.
+> - Include seed data for a few links and a migration or schema setup script.
+> - Add tests around redirect behavior and daily aggregation.
+>
+> Standard requirements: REST API with versioned routes, SQLite or Postgres, basic validation and error handling, performance consideration, regression tests, README with architecture notes and LLM prompts, TypeScript backend, React-like frontend.
+
+---
+
+### 2 — Internal planning prompt 
+
+> "Design a comprehensive implementation plan for a URL Shortener with Click Analytics project. The workspace is completely empty. [full brief]. Design the following: complete directory structure, tech stack choices with justifications (TypeScript backend, React frontend), database schema with complete SQL DDL and indexes, API routes with request/response shapes, key implementation files list with purpose, test strategy, performance considerations for scale, single-command startup approach."
+
+---
+
+### 3 — CSS framework clarification 
+
+> "Which CSS approach should the frontend use? The brief says keep styling simple and focus on clarity."
+
+**User selected:** Plain CSS modules (scoped `.module.css` per component, no extra dependencies).
+
+---
+
+### 4 — Codebase exploration 
+> "Explore the workspace at j:\Users\Public\Workspace\URLShortener to understand what's already there. List all files and directories, read any existing configuration files, and report the complete directory structure."
+
+**Result:** Workspace was completely empty; full implementation built from scratch.
+
+---
+
+### 5 — Dead code question 
+
+> "what is this unused function for?" [referenced `seed.ts:23` — the `weightedRandom` function]
+
+**Finding:** `weightedRandom` was defined but never called. The seed loop uses `DAY_WEIGHTS[dayOfWeek]` directly as a click-count multiplier instead. Function was deleted.
+
+---
+
+### 6 — UI debugging via Playwright MCP 
+
+> "use playwright mcp to test the UI, server is started but don't see the UI"
+
+**Diagnosis:** Vite was binding only to the IPv6 loopback (`::1`) on Windows, making `localhost` (IPv4) unreachable from the Playwright browser.
+
+**Fix:** Added `host: '127.0.0.1'` to the `server` block in `frontend/vite.config.ts`.
+
+---
+
+### 7 — Prompts documentation 
+
+> "log all the prompts used here to the readme.md file prompts section"
+
+---
+
+### Notes on generated code
+
+- All SQL uses prepared statements — no string interpolation, no SQL injection vector.
+- React components use controlled inputs and never call `dangerouslySetInnerHTML`.
+- Error messages from the API are surfaced to the user as plain text, never rendered as HTML.
+- All generated code was reviewed for correctness and alignment with requirements before acceptance.
+
