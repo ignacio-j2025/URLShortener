@@ -91,4 +91,51 @@ describe('Analytics endpoint', () => {
     expect(res.body.data.shortUrl).toContain('meta-link');
     expect(typeof res.body.data.createdAt).toBe('string');
   });
+
+  it('returns correct clicks when from and to are the same date (single-day range)', async () => {
+    const id = insertLink(ctx.db, 'single-day', 'https://example.com');
+    insertClicks(ctx.db, id, 5, '2026-02-20');
+
+    const res = await request(ctx.app)
+      .get('/api/v1/links/single-day/analytics')
+      .query({ from: '2026-02-20', to: '2026-02-20' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.clicksByDay).toHaveLength(1);
+    expect(res.body.data.clicksByDay[0]).toEqual({ date: '2026-02-20', clicks: 5 });
+    expect(res.body.data.totalClicks).toBe(5);
+  });
+
+  it('returns empty clicksByDay but non-zero totalClicks when no clicks fall in the date range', async () => {
+    const id = insertLink(ctx.db, 'outside-range', 'https://example.com');
+    insertClicks(ctx.db, id, 4, '2026-01-01');
+    insertClicks(ctx.db, id, 3, '2026-03-01');
+
+    const res = await request(ctx.app)
+      .get('/api/v1/links/outside-range/analytics')
+      .query({ from: '2026-02-01', to: '2026-02-28' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.clicksByDay).toEqual([]);
+    expect(res.body.data.totalClicks).toBe(7);
+  });
+
+  it('correctly aggregates a large number of clicks', async () => {
+    const id = insertLink(ctx.db, 'high-volume', 'https://example.com');
+    const stmt = ctx.db.prepare(
+      "INSERT INTO clicks (link_id, clicked_at, user_agent) VALUES (?, '2026-02-15T00:00:00Z', 'bot')"
+    );
+    ctx.db.transaction(() => {
+      for (let i = 0; i < 1000; i++) stmt.run(id);
+    })();
+
+    const res = await request(ctx.app)
+      .get('/api/v1/links/high-volume/analytics')
+      .query({ from: '2026-02-15', to: '2026-02-15' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.totalClicks).toBe(1000);
+    expect(res.body.data.clicksByDay).toHaveLength(1);
+    expect(res.body.data.clicksByDay[0]).toEqual({ date: '2026-02-15', clicks: 1000 });
+  });
 });

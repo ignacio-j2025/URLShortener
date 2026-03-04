@@ -64,6 +64,62 @@ describe('Links API', () => {
         .send({ targetUrl: 'https://example.com', slug: 'ab' });
       expect(shortSlug.status).toBe(422);
     });
+
+    it('returns 422 for a slug containing uppercase letters', async () => {
+      const res = await request(ctx.app)
+        .post('/api/v1/links')
+        .send({ targetUrl: 'https://example.com', slug: 'MyLink' });
+
+      expect(res.status).toBe(422);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+
+    it('returns 422 for a slug longer than 50 characters', async () => {
+      const res = await request(ctx.app)
+        .post('/api/v1/links')
+        .send({ targetUrl: 'https://example.com', slug: 'a'.repeat(51) });
+
+      expect(res.status).toBe(422);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+
+    it('creates a link with a slug exactly 50 characters long (max boundary)', async () => {
+      const slug = 'a'.repeat(50);
+      const res = await request(ctx.app)
+        .post('/api/v1/links')
+        .send({ targetUrl: 'https://example.com', slug });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.slug).toBe(slug);
+    });
+
+    it('allows two different slugs pointing to the same target URL', async () => {
+      const target = 'https://shared-destination.com';
+
+      const first = await request(ctx.app)
+        .post('/api/v1/links')
+        .send({ targetUrl: target, slug: 'slug-one' });
+      const second = await request(ctx.app)
+        .post('/api/v1/links')
+        .send({ targetUrl: target, slug: 'slug-two' });
+
+      expect(first.status).toBe(201);
+      expect(second.status).toBe(201);
+      expect(first.body.data.slug).toBe('slug-one');
+      expect(second.body.data.slug).toBe('slug-two');
+    });
+
+    it('a slug matching an API path prefix does not shadow API routes', async () => {
+      const res = await request(ctx.app)
+        .post('/api/v1/links')
+        .send({ targetUrl: 'https://example.com', slug: 'api' });
+
+      expect(res.status).toBe(201);
+
+      // The versioned API route must remain reachable after creating the 'api' slug
+      const list = await request(ctx.app).get('/api/v1/links');
+      expect(list.status).toBe(200);
+    });
   });
 
   describe('GET /api/v1/links', () => {
@@ -91,6 +147,16 @@ describe('Links API', () => {
       expect(page2.body.data.items).toHaveLength(2);
       expect(page2.body.data.page).toBe(2);
       expect(page2.body.data.total).toBe(5);
+    });
+
+    it('returns empty items when paginating beyond the last page', async () => {
+      insertLink(ctx.db, 'only-one', 'https://example.com');
+
+      const res = await request(ctx.app).get('/api/v1/links?page=99&limit=20');
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.items).toEqual([]);
+      expect(res.body.data.total).toBe(1);
     });
   });
 

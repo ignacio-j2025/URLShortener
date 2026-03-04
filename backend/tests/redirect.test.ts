@@ -85,4 +85,39 @@ describe('Redirect endpoint', () => {
     const res = await request(ctx.app).get('/api/v1/links');
     expect(res.status).toBe(200);
   });
+
+  it('matches a slug containing hyphens and digits', async () => {
+    insertLink(ctx.db, 'my-link-123', 'https://example.com');
+
+    const res = await request(ctx.app)
+      .get('/my-link-123')
+      .redirects(0);
+
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('https://example.com');
+  });
+
+  it('preserves query string and fragment exactly in the Location header', async () => {
+    const target = 'https://example.com/path?q=1&lang=en#section';
+    insertLink(ctx.db, 'complex-url', target);
+
+    const res = await request(ctx.app)
+      .get('/complex-url')
+      .redirects(0);
+
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe(target);
+  });
+
+  it('matches a slug at the 50-character maximum length', async () => {
+    const slug = 'a'.repeat(50);
+    insertLink(ctx.db, slug, 'https://example.com');
+
+    const res = await request(ctx.app)
+      .get(`/${slug}`)
+      .redirects(0);
+
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('https://example.com');
+  });
 });
