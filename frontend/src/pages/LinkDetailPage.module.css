@@ -59,15 +59,6 @@
   min-width: 0;
 }
 
-.slugCode {
-  font-family: monospace;
-  font-size: 16px;
-  font-weight: 600;
-  background: #f1f5f9;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
 .slugLink {
   font-family: monospace;
   font-size: 16px;
@@ -266,12 +257,3 @@
   text-align: center;
 }
 
-.shortUrlBox {
-  font-size: 14px;
-  color: #64748b;
-}
-
-.shortUrlBox a {
-  color: #3b82f6;
-  font-family: monospace;
-}

@@ -46,29 +46,23 @@ describe('Links API', () => {
       expect(res.body.error.code).toBe('SLUG_TAKEN');
     });
 
-    it('returns 422 for an invalid URL', async () => {
-      const res = await request(ctx.app)
+    it('returns 422 for invalid input', async () => {
+      const invalidUrl = await request(ctx.app)
         .post('/api/v1/links')
         .send({ targetUrl: 'not-a-url' });
 
-      expect(res.status).toBe(422);
-      expect(res.body.success).toBe(false);
-      expect(res.body.error.code).toBe('VALIDATION_ERROR');
-      expect(res.body.error.message).toHaveProperty('targetUrl');
-    });
+      expect(invalidUrl.status).toBe(422);
+      expect(invalidUrl.body.success).toBe(false);
+      expect(invalidUrl.body.error.code).toBe('VALIDATION_ERROR');
+      expect(invalidUrl.body.error.message).toHaveProperty('targetUrl');
 
-    it('returns 422 when targetUrl is missing', async () => {
-      const res = await request(ctx.app).post('/api/v1/links').send({});
-      expect(res.status).toBe(422);
-    });
+      const missingUrl = await request(ctx.app).post('/api/v1/links').send({});
+      expect(missingUrl.status).toBe(422);
 
-    it('returns 422 for a slug that is too short', async () => {
-      const res = await request(ctx.app)
+      const shortSlug = await request(ctx.app)
         .post('/api/v1/links')
         .send({ targetUrl: 'https://example.com', slug: 'ab' });
-
-      expect(res.status).toBe(422);
-      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(shortSlug.status).toBe(422);
     });
   });
 
@@ -81,27 +75,22 @@ describe('Links API', () => {
       expect(res.body.data.total).toBe(0);
     });
 
-    it('returns all links with totalClicks', async () => {
-      insertLink(ctx.db, 'link-a', 'https://a.com');
-      insertLink(ctx.db, 'link-b', 'https://b.com');
-
-      const res = await request(ctx.app).get('/api/v1/links');
-      expect(res.status).toBe(200);
-      expect(res.body.data.items).toHaveLength(2);
-      expect(res.body.data.total).toBe(2);
-      expect(res.body.data.items[0]).toHaveProperty('totalClicks', 0);
-    });
-
-    it('paginates results', async () => {
+    it('returns all links with totalClicks and paginates', async () => {
       for (let i = 0; i < 5; i++) {
         insertLink(ctx.db, `link-${i}`, `https://example${i}.com`);
       }
 
-      const res = await request(ctx.app).get('/api/v1/links?page=2&limit=2');
-      expect(res.status).toBe(200);
-      expect(res.body.data.items).toHaveLength(2);
-      expect(res.body.data.page).toBe(2);
-      expect(res.body.data.total).toBe(5);
+      const all = await request(ctx.app).get('/api/v1/links');
+      expect(all.status).toBe(200);
+      expect(all.body.data.items).toHaveLength(5);
+      expect(all.body.data.total).toBe(5);
+      expect(all.body.data.items[0]).toHaveProperty('totalClicks', 0);
+
+      const page2 = await request(ctx.app).get('/api/v1/links?page=2&limit=2');
+      expect(page2.status).toBe(200);
+      expect(page2.body.data.items).toHaveLength(2);
+      expect(page2.body.data.page).toBe(2);
+      expect(page2.body.data.total).toBe(5);
     });
   });
 

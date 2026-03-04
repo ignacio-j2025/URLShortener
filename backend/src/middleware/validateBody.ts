@@ -14,16 +14,3 @@ export function validateBody<T>(schema: ZodSchema<T>) {
     next();
   };
 }
-
-export function validateQuery<T>(schema: ZodSchema<T>) {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const result = schema.safeParse(req.query);
-    if (!result.success) {
-      const fieldErrors = (result.error as ZodError).flatten().fieldErrors;
-      res.status(422).json(errorResponse('VALIDATION_ERROR', fieldErrors));
-      return;
-    }
-    res.locals.validatedQuery = result.data;
-    next();
-  };
-}
