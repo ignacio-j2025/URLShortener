@@ -22,18 +22,104 @@
   margin-bottom: 28px;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 4px 0;
+.metaCard {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px 24px;
 }
 
-.targetUrl {
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.metaRow + .metaRow {
+  border-top: 1px solid #f1f5f9;
+}
+
+.metaLabel {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  width: 64px;
+  flex-shrink: 0;
+}
+
+.metaValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
-  color: #64748b;
-  margin: 0;
+  color: #1e293b;
+  min-width: 0;
+}
+
+.slugCode {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 600;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.slugLink {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 600;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.slugLink:hover {
+  text-decoration: underline;
+  background: #e0e7ff;
+}
+
+.copyBtn {
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  color: #374151;
+  transition: background 0.1s;
+  white-space: nowrap;
+}
+
+.copyBtn:hover {
+  background: #f1f5f9;
+}
+
+.copied {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.favicon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.targetLink {
+  color: #3b82f6;
+  text-decoration: none;
   word-break: break-all;
+}
+
+.targetLink:hover {
+  text-decoration: underline;
 }
 
 .statsRow {
@@ -73,6 +159,41 @@
   align-items: center;
   font-size: 13px;
   color: #64748b;
+  flex-wrap: wrap;
+}
+
+.quickFilters {
+  display: flex;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.quickBtn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.quickBtn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.quickBtnActive {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.quickBtnActive:hover {
+  background: #2563eb;
+  color: #fff;
 }
 
 .dateInput {
@@ -96,6 +217,46 @@
   color: #dc2626;
   font-size: 14px;
   margin-bottom: 16px;
+}
+
+.retryBtn {
+  margin-left: 12px;
+  padding: 4px 14px;
+  border: 1px solid #dc2626;
+  border-radius: 5px;
+  background: #fff;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.retryBtn:hover {
+  background: #fef2f2;
+}
+
+.notFound {
+  text-align: center;
+  padding: 48px 24px;
+  color: #64748b;
+}
+
+.notFound h2 {
+  font-size: 20px;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+}
+
+.notFound p {
+  margin: 0 0 16px 0;
+}
+
+.notFound a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.notFound a:hover {
+  text-decoration: underline;
 }
 
 .loading {

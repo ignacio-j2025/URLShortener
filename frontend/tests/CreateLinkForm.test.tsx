@@ -105,4 +105,52 @@ describe('CreateLinkForm', () => {
       expect(screen.getByText(/that slug is already taken/i)).toBeInTheDocument();
     });
   });
+
+  it('auto-prepends https:// when user types a bare domain', async () => {
+    const user = userEvent.setup();
+    mockMutate.mockImplementation((_data: unknown, options: { onSuccess: () => void }) => {
+      options.onSuccess();
+    });
+    render(<CreateLinkForm />);
+
+    await user.type(screen.getByLabelText(/destination url/i), 'example.com');
+    await user.click(screen.getByRole('button', { name: /create short link/i }));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      { targetUrl: 'https://example.com', slug: undefined },
+      expect.any(Object)
+    );
+  });
+
+  it('does not prepend https:// when URL already has http://', async () => {
+    const user = userEvent.setup();
+    mockMutate.mockImplementation((_data: unknown, options: { onSuccess: () => void }) => {
+      options.onSuccess();
+    });
+    render(<CreateLinkForm />);
+
+    await user.type(screen.getByLabelText(/destination url/i), 'http://example.com');
+    await user.click(screen.getByRole('button', { name: /create short link/i }));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      { targetUrl: 'http://example.com', slug: undefined },
+      expect.any(Object)
+    );
+  });
+
+  it('does not prepend https:// when URL already has https://', async () => {
+    const user = userEvent.setup();
+    mockMutate.mockImplementation((_data: unknown, options: { onSuccess: () => void }) => {
+      options.onSuccess();
+    });
+    render(<CreateLinkForm />);
+
+    await user.type(screen.getByLabelText(/destination url/i), 'https://example.com');
+    await user.click(screen.getByRole('button', { name: /create short link/i }));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      { targetUrl: 'https://example.com', slug: undefined },
+      expect.any(Object)
+    );
+  });
 });

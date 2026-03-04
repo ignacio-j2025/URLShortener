@@ -74,6 +74,21 @@
   font-size: 14px;
 }
 
+.retryBtn {
+  margin-left: 12px;
+  padding: 4px 14px;
+  border: 1px solid #dc2626;
+  border-radius: 5px;
+  background: #fff;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.retryBtn:hover {
+  background: #fef2f2;
+}
+
 .loading {
   color: #94a3b8;
   font-size: 14px;

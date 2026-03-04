@@ -3,6 +3,7 @@ import { Database } from 'better-sqlite3';
 import { successResponse } from '../utils/apiResponse.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { LinkRow, DailyClickRow } from '../types/index.js';
+import { config } from '../config.js';
 
 function defaultDateRange(): { from: string; to: string } {
   const to = new Date();
@@ -21,8 +22,8 @@ export function createAnalyticsController(db: Database) {
         const slug = String(req.params.slug);
 
         const link = db
-          .prepare<[string], Pick<LinkRow, 'id' | 'slug' | 'target_url'>>(
-            'SELECT id, slug, target_url FROM links WHERE slug = ?'
+          .prepare<[string], Pick<LinkRow, 'id' | 'slug' | 'target_url' | 'created_at'>>(
+            'SELECT id, slug, target_url, created_at FROM links WHERE slug = ?'
           )
           .get(slug);
 
@@ -61,6 +62,8 @@ export function createAnalyticsController(db: Database) {
           successResponse({
             slug: link.slug,
             targetUrl: link.target_url,
+            shortUrl: `${config.baseUrl}/${link.slug}`,
+            createdAt: link.created_at,
             totalClicks: totalRow.total,
             clicksByDay: clicksByDay.map((r) => ({ date: r.day, clicks: r.clicks })),
           })

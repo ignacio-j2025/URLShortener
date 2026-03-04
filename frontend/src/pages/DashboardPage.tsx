@@ -7,7 +7,7 @@ import styles from './DashboardPage.module.css';
 export function DashboardPage() {
   const [page, setPage] = useState(1);
   const limit = 20;
-  const { data, isLoading, isError, error } = useLinks(page, limit);
+  const { data, isLoading, isError, error, refetch } = useLinks(page, limit);
 
   const totalPages = data ? Math.ceil(data.total / limit) : 1;
 
@@ -31,12 +31,13 @@ export function DashboardPage() {
         {isError && (
           <div className={styles.error}>
             Failed to load links: {error instanceof Error ? error.message : 'Unknown error'}
+            <button className={styles.retryBtn} onClick={() => refetch()}>Retry</button>
           </div>
         )}
 
         {isLoading
           ? <div className={styles.loading}>Loading…</div>
-          : data && <LinksTable links={data.items} />
+          : data && <LinksTable links={data.items} totalLinks={data.total} />
         }
 
         {data && totalPages > 1 && (

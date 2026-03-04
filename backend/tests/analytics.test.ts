@@ -88,4 +88,22 @@ describe('Analytics endpoint', () => {
     expect(res.body.data.slug).toBe('meta-link');
     expect(res.body.data.targetUrl).toBe('https://meta.com');
   });
+
+  it('returns createdAt in the response', async () => {
+    insertLink(ctx.db, 'created-link', 'https://example.com');
+    const res = await request(ctx.app).get('/api/v1/links/created-link/analytics');
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.createdAt).toBeDefined();
+    expect(typeof res.body.data.createdAt).toBe('string');
+  });
+
+  it('returns shortUrl in the response', async () => {
+    insertLink(ctx.db, 'short-link', 'https://example.com');
+    const res = await request(ctx.app).get('/api/v1/links/short-link/analytics');
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.shortUrl).toBeDefined();
+    expect(res.body.data.shortUrl).toContain('short-link');
+  });
 });

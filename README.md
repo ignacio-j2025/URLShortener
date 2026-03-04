@@ -197,6 +197,7 @@ Create `backend/.env` to override defaults:
 - **Click recording is best-effort**: If the INSERT fails after the 302 is sent, the click is silently lost. This is a deliberate trade-off: redirect latency is never degraded by database issues.
 - **No click deduplication**: Every redirect creates one click row. Bot filtering or deduplication by IP/time window would be a production enhancement.
 - **Vite dev proxy**: In development, Vite proxies `/api` → `:3001`. In production, configure your reverse proxy (nginx/Caddy) to route `/api` and short slugs to the backend.
+**Duplicate destination URLs**: I intentionally allowed duplicate destination URLs while enforcing unique slugs. This enables multiple short links to point to the same target while preserving independent analytics.
 
 ## Trade-offs
 
@@ -285,6 +286,62 @@ This project was built with [Claude Code](https://claude.ai/claude-code) (claude
 ### 7 — Prompts documentation 
 
 > "log all the prompts used here to the readme.md file prompts section"
+
+---
+
+### 8 — UI improvement prompt
+
+> "Keep UI styling simple; focus on clarity, validation, empty states, and errors. Can we improve our UI based on this prompt?"
+
+**Outcome:** Plan created covering: Retry buttons on error states (Dashboard + Analytics), 404 "not found" state for invalid slugs, date input guards against blank values, empty-state distinction in links table (no links overall vs. no links on this page), and inline delete-error banners.
+
+---
+
+### 9 — Additional UI feedback
+
+> "i have some additional feedback:
+> I think the generated slugs should be clickable so the user can instantly see the count increase on the screen
+> I'd like to include a favicon for each slug
+> track any user prompts in the prompts section of the readme"
+
+**Outcome:** Slugs in the links table are now clickable `<a>` tags pointing to the redirect URL (opens in new tab, records a click). Favicons from Google's favicon service displayed next to each destination URL. All prompts recorded in this section.
+
+---
+
+### 10 — UI validation and implementation
+
+> "also validate the UI is still functional using the playwright mcp"
+
+**Outcome:** All UI improvements from prompts 8–9 implemented: Retry buttons, 404 state, date guards, empty-state distinction, delete-error banners, clickable slugs, and favicons. Validated via Playwright MCP — dashboard, analytics page, 404 page, and form validation all confirmed working.
+
+---
+
+### 11 — Click counter not updating
+
+> "there seems to be an issue with the links and the counter. When I click the link from the slug tab it doesnt immediately update the count, reproduce this using the playwright mcp"
+
+**Diagnosis:** Clicking a `target="_blank"` slug link opens a new tab without the dashboard tab losing focus, so TanStack Query's `refetchOnWindowFocus` never triggers — the click count stays stale.
+
+**Fix:** Added an `onClick` handler on slug `<a>` tags that calls `queryClient.invalidateQueries({ queryKey: ['links'] })` after a 500ms delay, giving the backend time to record the click before the dashboard refetches. Verified via Playwright: count updated from 3 → 4 immediately after clicking.
+
+---
+
+### 12 — Prompts documentation update
+
+> "update readme with the prompts"
+
+---
+
+### 13 — Analytics page improvements
+
+> "Feedback for analytics page.
+> Add "Total clicks (range)" metric
+> Add 7D / 30D / 90D quick filters
+> Add Link Metadata at Top — Instead of just /gh-home → https://github.com, improve hierarchy: Slug: gh-home, Target: https://github.com, Created: Jan 12, 2026
+> Add Copy Button to Slug
+> Show favicon in analytics as well"
+
+**Outcome:** Added a "Total clicks (range)" StatCard. Added 7D/30D/90D quick-filter buttons that pre-set the date range (manual date pickers switch to "custom" mode). Replaced the plain header with a structured metadata card showing Slug (with Copy button), Target (with favicon), and Created date. Backend analytics endpoint updated to return `createdAt`. Frontend `AnalyticsData` type updated to include `createdAt`.
 
 ---
 

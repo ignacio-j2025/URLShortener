@@ -15,6 +15,8 @@ export interface ClicksByDay {
 export interface AnalyticsData {
   slug: string;
   targetUrl: string;
+  shortUrl: string;
+  createdAt: string;
   totalClicks: number;
   clicksByDay: ClicksByDay[];
 }

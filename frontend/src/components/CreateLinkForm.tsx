@@ -3,7 +3,7 @@ import { useCreateLink } from '../hooks/useLinks.js';
 import { ApiRequestError } from '../api/client.js';
 import styles from './CreateLinkForm.module.css';
 
-const URL_RE = /^https?:\/\/.+/;
+const URL_RE = /^https?:\/\/[^\s/$.?#]+\.[^\s]+$/;
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$|^[a-z0-9]{3}$/;
 
 export function CreateLinkForm() {
@@ -15,15 +15,15 @@ export function CreateLinkForm() {
 
   const { mutate, isPending } = useCreateLink();
 
-  function validate(): boolean {
+  function validate(url: string): boolean {
     let valid = true;
     setUrlError('');
     setSlugError('');
 
-    if (!targetUrl.trim()) {
+    if (!url) {
       setUrlError('Target URL is required');
       valid = false;
-    } else if (!URL_RE.test(targetUrl.trim())) {
+    } else if (!URL_RE.test(url)) {
       setUrlError('Must be a valid URL starting with http:// or https://');
       valid = false;
     }
@@ -39,10 +39,18 @@ export function CreateLinkForm() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setApiError('');
-    if (!validate()) return;
+
+    // Auto-prepend https:// if user typed a bare domain
+    let url = targetUrl.trim();
+    if (url && !/^https?:\/\//i.test(url)) {
+      url = `https://${url}`;
+      setTargetUrl(url);
+    }
+
+    if (!validate(url)) return;
 
     mutate(
-      { targetUrl: targetUrl.trim(), slug: slug.trim() || undefined },
+      { targetUrl: url, slug: slug.trim() || undefined },
       {
         onSuccess: () => {
           setTargetUrl('');
