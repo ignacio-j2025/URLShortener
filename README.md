@@ -15,11 +15,11 @@ npm install --prefix frontend
 # 2. Seed the database with sample data
 npm run seed
 
-# 3. Start both backend (port 3000) and frontend (port 5173)
+# 3. Start both backend (port 3001) and frontend (port 3000)
 npm run dev
 ```
 
-Open **http://localhost:5173** in your browser.
+Open **http://localhost:3000** in your browser.
 
 ## Architecture
 
@@ -184,9 +184,9 @@ Create `backend/.env` to override defaults:
 
 | Variable | Default | Description |
 |---|---|---|
-| `PORT` | `3000` | Backend HTTP port |
+| `PORT` | `3001` | Backend HTTP port |
 | `DB_PATH` | `./data/urlshortener.db` | SQLite file path |
-| `BASE_URL` | `http://localhost:3000` | Used to build `shortUrl` in responses |
+| `BASE_URL` | `http://localhost:3001` | Used to build `shortUrl` in responses |
 | `NODE_ENV` | `development` | `production` suppresses stack traces |
 
 ## Assumptions & Simplifications
@@ -196,7 +196,7 @@ Create `backend/.env` to override defaults:
 - **Timestamps in UTC ISO-8601 text**: SQLite has no native datetime type. All times are UTC strings; the frontend formats them for display.
 - **Click recording is best-effort**: If the INSERT fails after the 302 is sent, the click is silently lost. This is a deliberate trade-off: redirect latency is never degraded by database issues.
 - **No click deduplication**: Every redirect creates one click row. Bot filtering or deduplication by IP/time window would be a production enhancement.
-- **Vite dev proxy**: In development, Vite proxies `/api` → `:3000`. In production, configure your reverse proxy (nginx/Caddy) to route `/api` and short slugs to the backend.
+- **Vite dev proxy**: In development, Vite proxies `/api` → `:3001`. In production, configure your reverse proxy (nginx/Caddy) to route `/api` and short slugs to the backend.
 
 ## Trade-offs
 

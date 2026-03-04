@@ -9,12 +9,12 @@ export function createApp(db: Database): Express {
   const app = express();
 
   app.use(express.json());
-  // Allow the Vite dev server (port 5173) and any production origin
+  // Allow the Vite dev server (port 3000) and any production origin
   app.use(
     cors({
       origin: [
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
         process.env.CORS_ORIGIN ?? '',
       ].filter(Boolean),
       methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
