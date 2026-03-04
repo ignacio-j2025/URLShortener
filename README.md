@@ -343,6 +343,22 @@ This project was built with [Claude Code](https://claude.ai/claude-code) (claude
 
 ---
 
+### 14 — Right-click open-in-new-tab click count bug
+
+> "Noticed that when you right click and choose to open the slug in a new tab, the clicked value will only reflect after you've actually clicked the slug"
+
+**Diagnosis:** The `onClick` handler on slug `<a>` tags does not fire on right-click. When a user right-clicks and selects "Open in new tab", `onClick` is never triggered, so `queryClient.invalidateQueries` was never called and the click count stayed stale until the next left-click.
+
+**Fix:** Added `onContextMenu` handlers alongside the existing `onClick` handlers on slug links in both `LinksTable.tsx` and `LinkDetailPage.tsx`. The context menu handler uses a 2000ms delay (vs. 800ms for left-click) to account for the extra time needed for the user to interact with the context menu, the new tab to load, and the backend to record the click.
+
+---
+
+### 15 — Prompts documentation update
+
+> "add my prompts to readme"
+
+---
+
 ### Notes on generated code
 
 - All SQL uses prepared statements — no string interpolation, no SQL injection vector.

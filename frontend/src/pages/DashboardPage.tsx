@@ -14,8 +14,8 @@ export function DashboardPage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>URL Shortener</h1>
-        <p className={styles.subtitle}>Create and manage short links, track clicks.</p>
+        <h1 className={styles.title}>URL Shortener & Analytics Dashboard</h1>
+        <p className={styles.subtitle}>Create and manage short links, track click events, and view usage stats over time.</p>
       </div>
 
       <div className={styles.section}>

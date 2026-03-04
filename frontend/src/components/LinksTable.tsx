@@ -80,6 +80,14 @@ export function LinksTable({ links, totalLinks }: LinksTableProps) {
                       queryClient.invalidateQueries({ queryKey: ['links'] });
                     }, 800);
                   }}
+                  onContextMenu={() => {
+                    // Right-click (e.g. "Open in new tab") doesn't fire onClick,
+                    // so we also invalidate on context menu with a longer delay
+                    // to allow the user to navigate and the backend to record the click.
+                    setTimeout(() => {
+                      queryClient.invalidateQueries({ queryKey: ['links'] });
+                    }, 800);
+                  }}
                 >
                   {link.slug}
                 </a>
