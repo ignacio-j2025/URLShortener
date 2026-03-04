@@ -8,9 +8,7 @@ A full-stack URL shortener with a click tracking dashboard. Create short links, 
 
 ```bash
 # 1. Install all dependencies
-npm install
-npm install --prefix backend
-npm install --prefix frontend
+npm run install:all
 
 # 2. Seed the database with sample data
 npm run seed

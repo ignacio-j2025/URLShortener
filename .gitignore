@@ -3,3 +3,4 @@ package-lock.json
 node_modules
 /backend/data
 .playwright-mcp
+dist
