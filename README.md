@@ -172,9 +172,9 @@ Creates 3 links with 90 days of synthetic click data. Safe to re-run (uses `INSE
 
 | Slug | Destination |
 |---|---|
-| `gh-home` | https://github.com |
-| `hn-front` | https://news.ycombinator.com |
-| `mdn-js` | https://developer.mozilla.org/en-US/docs/Web/JavaScript |
+| `gh-home` | <https://github.com> |
+| `hn-front` | <https://news.ycombinator.com> |
+| `mdn-js` | <https://developer.mozilla.org/en-US/docs/Web/JavaScript> |
 
 ## Configuration
 
